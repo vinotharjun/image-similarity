@@ -1,0 +1,67 @@
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    </head> 
+<div>
+    <form id="form1" runat="server">
+        <input type='file' id="image1" />
+        <img id="blah" src="#" alt="your image" />
+    </form>
+</div>
+<div>
+    <form id="form2" runat="server">
+        <input type='file' id="image2" />
+        <img id="image_2" src="#" alt="your image" />
+    </form>
+    <button onclick="compare()">Compare images</button>
+</div>
+<div id="result">
+
+</div>
+<script>
+
+        function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            
+            reader.onload = function (e) {
+                $('#blah').attr('src', e.target.result);
+            }
+            
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    function readURL2(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            
+            reader.onload = function (e) {
+                $('#image_2').attr('src', e.target.result);
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    $("#image1").change(function(){
+        readURL(this);
+    });
+    $("#image2").change(function(){
+        readURL2(this);
+    });
+function compare(){
+
+    var formData = new FormData();
+var imagefile = document.querySelector('#image1');
+var imagefile2 = document.querySelector('#image2');
+formData.append("image1", imagefile.files[0]);
+formData.append("image2", imagefile2.files[0]);
+axios.post('http://127.0.0.1:5000/predict', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+}).then(data =>{
+    console.log(data.data.similarity_score)
+  var id = document.getElementById("result")
+  id.innerHTML =data.data.similarity_score
+})
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
