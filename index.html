@@ -1,18 +1,29 @@
 <head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     </head> 
+
 <div>
     <form id="form1" runat="server">
         <input type='file' id="image1" />
         <img id="blah" src="#" alt="your image" />
     </form>
 </div>
+
 <div>
     <form id="form2" runat="server">
         <input type='file' id="image2" />
         <img id="image_2" src="#" alt="your image" />
+        
     </form>
+        <select name="algo" id="type">
+            <option value="resnet18">ResNet 18</option>
+            <option value="resnet34">ResNet 34</option>
+            <option value="vgg16">VGG 16</option>
+            <option value="tripplet">one shot learning </option>
+          </select>
+
     <button onclick="compare()">Compare images</button>
+    <button onclick="window.location='./engine.html'">Go to search engine</button> 
 </div>
 <div id="result">
 
@@ -47,12 +58,14 @@
         readURL2(this);
     });
 function compare(){
-
+    var type = document.getElementById("type").value
+    console.log(type)
     var formData = new FormData();
 var imagefile = document.querySelector('#image1');
 var imagefile2 = document.querySelector('#image2');
 formData.append("image1", imagefile.files[0]);
 formData.append("image2", imagefile2.files[0]);
+formData.append("type",type)
 axios.post('http://127.0.0.1:5000/predict', formData, {
     headers: {
       'Content-Type': 'multipart/form-data'

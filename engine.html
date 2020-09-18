@@ -1,0 +1,66 @@
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    </head> 
+<div>
+    <form id="form1" runat="server">
+        <input type='file' id="image" />
+        <img id="blah" src="#" alt="your image" />
+    </form>
+</div>
+<div>
+
+    <button onclick="compare()">Search images</button>
+</div>
+<div id="result">
+
+</div>
+<script>
+
+        function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            
+            reader.onload = function (e) {
+                $('#blah').attr('src', e.target.result);
+            }
+            
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    $("#image").change(function(){
+        readURL(this);
+    });
+function compare(){
+    var id = document.getElementById("result")
+    id.innerHTML = "request is loading...."
+    var formData = new FormData();
+var imagefile = document.querySelector('#image');
+formData.append("image", imagefile.files[0]);
+axios.post('http://127.0.0.1:5000/search', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+}).then(data =>{
+    
+    var id = document.getElementById("result")
+    id.innerHTML = ""
+    // console.log(data.data.list)
+  for (var i in data.data.list){
+    //   final+="<img src='"+i+"' />"
+      var img = document.createElement('img'); 
+        img.height = "200";
+        img.width = "200"
+        img.src =  data.data.list[i]
+           id.appendChild(img)
+           if (i==100){
+               break
+           }
+
+  }
+//   final+="</div>"
+  
+//   id.innerHTML =
+})
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

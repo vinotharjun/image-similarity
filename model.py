@@ -2,6 +2,7 @@ import torch
 from config import *
 import torch.nn as nn
 from torchvision import transforms
+
 from torchvision import models
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 def load_model():
@@ -15,6 +16,17 @@ def load_model():
         model_50.fc = last_layer
     model_50.to(device)
     return model_50
+def load_other_feature_extractor(model_type):
+    if model_type == "resnet18":
+        fextractor = models.resnet18(pretrained=True)
+    elif model_type =="vgg16":
+        fextractor = models.vgg16(pretrained=True)
+    elif model_type == "resnet34":
+        fextractor = models.resnet34(pretrained=True)
+    features_model = nn.Sequential(*list(fextractor.children())[:-1])
+    return features_model
+
+
 
 class EmbeddingNet(nn.Module):
     def __init__(self,pretrained_net):
@@ -55,16 +67,33 @@ res = load_model()
 embedding_net = EmbeddingNet(res)
 model = TripletNet(embedding_net)
 
+
 def load_weights(model=model):
     loaded_data = torch.load(MODEL_WEIGHTS_PATH,map_location={"cuda:0":"cpu"})
     model.load_state_dict(loaded_data)
     return model
 embedding_net = load_weights(model)
 embedding_net.eval()
-def prediction(image):
-    tensor = transform_image(image=image)
-    output = embedding_net.get_embedding(tensor)
-    return output
+
+def prediction(image,model_type="tripplet"):
+    if model_type!="tripplet":
+        fextractor = load_other_feature_extractor(model_type)
+        tensor = transform_image(image=image)
+        output = fextractor(tensor.to(device))
+        # print(output.shape)
+        if "vgg" in model_type:
+            output = torch.nn.AdaptiveAvgPool2d((1))(output)
+        output = output.squeeze()
+        # print(output.shape)
+        return output
+    else:
+        tensor = transform_image(image=image)
+        output = embedding_net.get_embedding(tensor).squeeze()
+        # print(output.shape)
+        return output
+ 
+        
+
 
 
 # loaded_data = torch.load(MODEL_WEIGHTS_PATH,map_location={"cuda:0":"cpu"})
