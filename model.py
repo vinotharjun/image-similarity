@@ -92,7 +92,7 @@ def prediction(image,model_type="tripplet"):
         # print(output.shape)
         return output
  
-        
+
 
 
 

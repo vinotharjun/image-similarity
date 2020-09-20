@@ -48,9 +48,10 @@ axios.post('http://127.0.0.1:5000/search', formData, {
   for (var i in data.data.list){
     //   final+="<img src='"+i+"' />"
       var img = document.createElement('img'); 
-        img.height = "200";
-        img.width = "200"
         img.src =  data.data.list[i]
+        img.height ="250"
+        img.width = "250"
+        // console.log(data.data.scores[i])
            id.appendChild(img)
            if (i==100){
                break

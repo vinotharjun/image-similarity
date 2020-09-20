@@ -38,9 +38,11 @@ def load_storage():
     with open('data.pickle', 'rb') as handle:
         b = pickle.load(handle)
     return b
+def minmax(value):
+    return (value +1)/2
 def cosine_similarity(a,b):
     cos_sim = dot(a, b)/(norm(a)*norm(b))
-    return cos_sim
+    return minmax(cos_sim)
 
 def make_search(storage,query):
     distance = {}
@@ -52,7 +54,7 @@ def make_search(storage,query):
 def closest_pairs(distance):
     va =[]
     for i,value in distance.items():
-        if value>0.6:
+        if value>0.7:
             va.append({"image":i,"score":value})
     newlist=sorted(va, key = lambda k:k['score'], reverse=True)
     return newlist

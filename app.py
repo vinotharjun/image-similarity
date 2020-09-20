@@ -8,19 +8,25 @@ from model import prediction,transforms
 import cv2
 from numpy import dot
 from numpy.linalg import norm
+import json
 from flask_cors import CORS
 from search import main_search
 from flask import render_template
+from flask import send_from_directory
+import os
 
-app = Flask(__name__)
+app = Flask(__name__,template_folder='./')
 CORS(app)
 
-
+@app.route('/<path:filename>')
+def serve_static(filename):
+    root_dir = os.path.dirname(os.getcwd())
+    return send_from_directory(os.path.join(root_dir,"oneshot"), filename)
 
 
 @app.route('/')
 def hello():
-    return 'Hello World!'
+    return render_template("index.html")
 
 
 @app.route("/predict",methods=["POST"]) 
@@ -62,6 +68,8 @@ def predict():
 import math
 def sigmoid(x):
   return 1 / (1 + math.exp(-x))
+def minmax(value):
+    return (value +1)/2
 def cosine_similarity(a,b):
     cos_sim = dot(a, b)/(norm(a)*norm(b))
     return cos_sim
@@ -80,11 +88,16 @@ def search():
         close_list = main_search(image_feature)
         print(len(close_list))
         ret =[]
+        scores =[]
         for i in close_list:
             ret.append(i["image"])
+            scores.append(str(i["score"]))
         # print(ret)
+        # return jsonify(close_list)
+        # return json.dumps(close_list)
         return jsonify({
-            "list": ret
+            "list": ret,
+            "scores":scores
         })
 
 
